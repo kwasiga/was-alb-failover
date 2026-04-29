@@ -27,7 +27,7 @@ echo "<h1>Server [#number]</h1>" > /var/www/html/index.html
 4. Open `http://<instance-2-public-ip>` in browser → should show **Server [num]**
 
 
-## Step 4 — Create ALB Security Group
+## Step 3 — Create ALB Security Group
 
 Before creating the ALB, create a dedicated security group for it.
 
@@ -42,7 +42,22 @@ Before creating the ALB, create a dedicated security group for it.
 3. **Create Security Group**
 
 
+## Step 4 — Create Target Group
 
+1. Go to **EC2 → Load Balancing → Target Groups → Create Target Group**
+2. Configure:
+   - **Target type:** Instances
+   - **Name:** `ec2-target-group`
+   - **Protocol:** HTTP
+   - **Port:** 80
+   - **VPC:** Default VPC
+   - **Health check protocol:** HTTP
+   - **Health check path:** `/`
+3. Click **Next**
+4. Under **Register Targets:**
+   - Select both `server-1` and `server-2`
+   - Click **Include as pending below**
+5. Click **Create Target Group**
 
 
 
