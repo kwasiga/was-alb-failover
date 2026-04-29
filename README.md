@@ -33,7 +33,7 @@ Before creating the ALB, create a dedicated security group for it.
 
 1. Go to **EC2 → Network & Security → Security Groups → Create Security Group**
 2. Configure:
-   - **Name:** `alb-1`
+   - **Name:** `alb-sec-sg`
    - **Description:** ALB public traffic
    - **VPC:** Default VPC
    - **Inbound rules:**
@@ -47,7 +47,7 @@ Before creating the ALB, create a dedicated security group for it.
 1. Go to **EC2 → Load Balancing → Target Groups → Create Target Group**
 2. Configure:
    - **Target type:** Instances
-   - **Name:** `ec2-target-group`
+   - **Name:** `alb-tg`
    - **Protocol:** HTTP
    - **Port:** 80
    - **VPC:** Default VPC
@@ -58,6 +58,42 @@ Before creating the ALB, create a dedicated security group for it.
    - Select both `server-1` and `server-2`
    - Click **Include as pending below**
 5. Click **Create Target Group**
+
+
+## Step 5 — Create the Application Load Balancer
+
+1. Go to **EC2 → Load Balancing → Load Balancers → Create Load Balancer**
+2. Select **Application Load Balancer**
+3. Configure:
+   - **Name:** `alb1`
+   - **Scheme:** Internet-facing
+   - **IP address type:** IPv4
+   - **VPC:** Default VPC
+   - **Availability Zones:** Select **at least 2** (required by ALB)
+   - **Security groups:** Remove default → add `alb-sec-sg`
+4. Under **Listeners and routing:**
+   - Protocol: HTTP | Port: 80
+   - Default action: Forward to `alb-tg`
+5. Click **Create Load Balancer**
+
+
+## Step 6 — Verify ALB is Routing Traffic
+
+1. Go to **Load Balancers → select `alb1`**
+2. Copy the **DNS name** 
+3. Go to **Target Groups → alb-tg → Targets tab**
+4. Wait until both instances show **Healthy** status
+5. Open `DNS name` in browser
+6. Refresh several times — you should see **Server 1** and **Server 2** alternating
+
+## Step 7 — Failover Test
+
+1. Go to **EC2 → Instances → select `server-2`**
+2. **Instance State → Stop Instance** → confirm
+3. Wait ~60 seconds for the ALB health check to detect the instance is down
+4. Refresh DNS page repeatedly
+5. All traffic should now return **Server 2** only
+6. To restore: **Start** `server-2` → wait ~60 seconds → both servers return
 
 
 
